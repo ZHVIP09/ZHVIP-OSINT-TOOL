@@ -1,31 +1,33 @@
 document.getElementById('searchForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const query = document.getElementById('searchInput').value;
-    const apiKey = '87C3gGnnJGYT84yQBrRTjLoQj0G0w352';  // Replace with your actual API key
+    const query = 'example.com';  // Use a known working domain for verification
+    const apiKey = 'coSl6pEMCtCQIdJqTAvWpTUNpCARyHbf';
     const url = `https://api.securitytrails.com/v1/domain/${query}?apikey=${apiKey}`;
-    
+
     try {
         const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}, message: ${await response.text()}`);
+        }
         const data = await response.json();
-        displayResults(data);
+        displayVerificationResults(data);
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error verifying API key:', error);
+        displayError(error.message);
     }
 });
 
-function displayResults(data) {
+function displayVerificationResults(data) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     resultsDiv.style.display = 'block';
-
     if (data) {
         const resultItem = document.createElement('div');
         resultItem.className = 'result-item';
         resultItem.innerHTML = `
-            <h3>${data.hostname || 'No hostname available'}</h3>
-            <p>IP: ${data.ip || 'No IP available'}</p>
-            <p>Registrar: ${data.registrar || 'No registrar available'}</p>
-            <p>Updated: ${data.updated || 'No update date available'}</p>
+            <h3>Verification Successful</h3>
+            <p>Domain: example.com</p>
+            <p>Response: ${JSON.stringify(data, null, 2)}</p>
         `;
         resultsDiv.appendChild(resultItem);
     } else {
@@ -33,3 +35,13 @@ function displayResults(data) {
     }
 }
 
+function displayError(errorMessage) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+    resultsDiv.style.display = 'block';
+    const errorItem = document.createElement('div');
+    errorItem.className = 'result-item';
+    errorItem.style.color = 'red';
+    errorItem.innerHTML = `<p>Error: ${errorMessage}</p>`;
+    resultsDiv.appendChild(errorItem);
+}
